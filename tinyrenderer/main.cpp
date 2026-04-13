@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "our_gl.h"
 #include "model.h"
 
@@ -63,7 +65,10 @@ int main(int argc, char** argv) {
     init_zbuffer(width, height);
     TGAImage framebuffer(width, height, TGAImage::RGB, {177, 195, 209, 255});
 
+    const auto start = std::chrono::steady_clock::now();
+
     for (int m=1; m<argc; m++) {                    // iterate through all input objects
+        const auto model_start = std::chrono::steady_clock::now();
         Model model(argv[m]);                       // load the data
         PhongShader shader(light, model);
         for (int f=0; f<model.nfaces(); f++) {      // iterate through all facets
@@ -72,9 +77,14 @@ int main(int argc, char** argv) {
                               shader.vertex(f, 2) };
             rasterize(clip, shader, framebuffer);   // rasterize the primitive
         }
+        const auto model_end = std::chrono::steady_clock::now();
+        const std::chrono::duration<double> model_elapsed = model_end - model_start;
+        std::cout << argv[m] << " render time: " << model_elapsed.count() << " s" << std::endl;
     }
 
     framebuffer.write_tga_file("framebuffer.tga");
+    const auto end = std::chrono::steady_clock::now();
+    const std::chrono::duration<double> elapsed = end - start;
+    std::cout << "Total render time: " << elapsed.count() << " s" << std::endl;
     return 0;
 }
-
