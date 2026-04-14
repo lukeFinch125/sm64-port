@@ -88,3 +88,4 @@ int main(int argc, char** argv) {
     std::cout << "Total render time: " << elapsed.count() << " s" << std::endl;
     return 0;
 }
+
